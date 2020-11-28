@@ -12,7 +12,6 @@ class EmbedPaginator(Dialog):
     def __init__(self, client: discord.Client, pages: [discord.Embed], message: discord.Message = None):
         """
         Initialize a new EmbedPaginator.
-
         :param client: The :class:`discord.Client` to use.
         :param pages: A list of :class:`discord.Embed` to paginate through.
         :param message: An optional :class:`discord.Message` to edit. Otherwise a new message will be sent.
@@ -41,17 +40,14 @@ class EmbedPaginator(Dialog):
     async def run(self, users: List[discord.User], channel: discord.TextChannel = None):
         """
         Runs the paginator.
-
         :type users: List[discord.User]
         :param users:
             A list of :class:`discord.User` that can control the pagination.
             Passing an empty list will grant access to all users. (Not recommended.)
-
         :type channel: Optional[discord.TextChannel]
         :param channel:
             The text channel to send the embed to.
             Must only be specified if `self.message` is `None`.
-
         :return: None
         """
 
@@ -83,7 +79,10 @@ class EmbedPaginator(Dialog):
         while True:
             try:
                 reaction_add = asyncio.ensure_future(self._client.wait_for('reaction_add', check=check, timeout=100))
-                reaction_remove = asyncio.ensure_future(self._client.wait_for('reaction_remove', check=check, timeout=100))
+                if bot.permissions.manage_messages == False:
+                    reaction_remove = asyncio.ensure_future(self._client.wait_for('reaction_remove', check=check, timeout=100))
+                else:
+                    pass
                 completed, pending = await asyncio.wait({reaction_add, reaction_remove}, return_when='FIRST_COMPLETED')
                 for first_completed in completed:
                     reaction, user = first_completed.result()
@@ -142,7 +141,6 @@ class BotEmbedPaginator(EmbedPaginator):
     def __init__(self, ctx: commands.Context, pages: [discord.Embed], message: discord.Message = None):
         """
         Initialize a new EmbedPaginator.
-
         :param ctx: The :class:`discord.ext.commands.Context` to use.
         :param pages: A list of :class:`discord.Embed` to paginate through.
         :param message: An optional :class:`discord.Message` to edit. Otherwise a new message will be sent.
@@ -154,18 +152,15 @@ class BotEmbedPaginator(EmbedPaginator):
     async def run(self, channel: discord.TextChannel = None, users: List[discord.User] = None):
         """
         Runs the paginator.
-
         :type channel: Optional[discord.TextChannel]
         :param channel:
             The text channel to send the embed to.
             Default is the context channel.
-
         :type users: Optional[List[discord.User]]
         :param users:
             A list of :class:`discord.User` that can control the pagination.
             Default is the context author.
             Passing an empty list will grant access to all users. (Not recommended.)
-
         :return: None
         """
 
